@@ -1,0 +1,32 @@
+version: "2"
+services:
+  angular:
+    build: ./front
+    container_name: "angular-app"
+    ports:
+      - 4200:4200
+      - 80:80
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+  app:
+    links:
+      - "mongo:database"
+    container_name: "node-app"
+    build: ./server
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+    environment:
+    - url_redis_env=redis://redis
+  mongo:
+    image: mongo
+    container_name: "mongodb"
+    ports:
+      - "27017:27017"
